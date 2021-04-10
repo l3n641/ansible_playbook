@@ -1,0 +1,157 @@
+- name: install depend
+  yum: name=gcc,gcc-c++,pcre,pcre-devel,openssl,openssl-devel,zlib,zlib-devel,cmake,ncurses,ncurses-devel,bison,bison-devel,perl,perl-devel,autoconf
+
+
+- name: 当load_data_online为yes的时候,线上下载boost 
+  get_url:
+    validate_certs: no
+    url: "http://www.sourceforge.net/projects/boost/files/boost/1.59.0/boost_1_59_0.tar.gz"
+    dest: /usr/local
+    mode: 0755
+    force: no
+  when: load_data_online == 'yes'
+
+- name: 当load_data_online为no的时候,上传boost
+  copy:
+   src: files/boost_1_59_0.tar.gz
+   dest: /usr/local/boost_1_59_0.tar.gz
+   mode: 0777
+  when: load_data_online == 'no'
+
+
+- name: 解压 boost
+  unarchive:
+    src: /usr/local/boost_1_59_0.tar.gz
+    dest: /usr/local
+    copy: no
+
+- name: "重命名boost目录"
+  shell: "mv /usr/local/boost_1_59_0 /usr/local/boost  "
+
+    
+- name: 添加mysql账号
+  user: 
+    name: mysql
+    shell: /sbin/nologin
+    create_home: False
+
+- name: 当load_data_online为no的时候,上传mysql源码包
+  copy:
+   src: files/mysql-5.7.24.tar.gz
+   dest: /tmp/mysql-5.7.24.tar.gz
+   mode: 0777
+  when: load_data_online == 'no'
+
+
+- name: 当load_data_online为yes的时候,下载boost
+  get_url:
+    validate_certs: no
+    url: "https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.24.tar.gz"
+    dest: /tmp/mysql-5.7.24.tar.gz
+    mode: 0755
+    force: no
+  when: load_data_online == 'yes'
+
+
+- name: 解压 mysql源码包
+  unarchive:
+     src: /tmp/mysql-5.7.24.tar.gz
+     dest: /root
+     copy: no
+ 
+
+- name: cmake 预处理mysql源码
+  shell: "cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql-5.7.24 \
+  -DWITH_BOOST=/usr/local/boost \
+  -DMYSQL_UNIX_ADDR=/usr/local/mysql-5.7.24/tmp/mysql.sock \
+  -DMYSQL_DATADIR=/usr/local/mysql-5.7.24/data \
+  -DDEFAULT_CHARSET=utf8mb4 \
+  -DDEFAULT_COLLATION=utf8mb4_general_ci \
+  -DWITH_EXTRA_CHARSETS=all \
+  -DWITH_MYISAM_STORAGE_ENGINE=1 \
+  -DWITH_INNOBASE_STORAGE_ENGINE=1 \
+  -DWITH_MEMORY_STORAGE_ENGINE=1 \
+  -DWITH_READLINE=1 \
+  -DWITH_INNODB_MEMCACHED=1 \
+  -DWITH_DEBUG=OFF \
+  -DWITH_ZLIB=bundled \
+  -DENABLED_LOCAL_INFILE=1 \
+  -DENABLED_PROFILING=ON \
+  -DMYSQL_MAINTAINER_MODE=OFF \
+  -DMYSQL_TCP_PORT=3306
+  "
+  args:
+    chdir: /root/mysql-5.7.24
+
+- name: make && make install
+  shell: "make && make install"
+  args:
+    chdir: /root/mysql-5.7.24
+
+- name: link mysql
+  file:
+    src: /usr/local/mysql-5.7.24
+    dest:  /usr/local/mysql  
+    state: link
+
+- name: 创建mysql 日志 data pids tmp 目录
+  file:
+    path: /datas/mysql/{{ item }}
+    state: directory
+    owner: mysql
+    group: mysql
+    mode: 0777
+    recurse: yes
+  with_items:
+      - data
+      - tmp
+      - pids
+      - logs
+
+
+- name: 创建mysql日志文件
+  file:
+    dest: /datas/mysql/logs/mysqld.log 
+    mode: 0666
+    state: touch
+
+- name: 创建mysql pid 文件
+  file:
+    dest: /datas/mysql/pids/mysqld.pid  
+    mode: 0666
+    state: touch
+
+- name: 复制mysql.cnf到服务器
+  copy:
+    src: files/my.cnf
+    dest: /etc/my.cnf
+    mode: 0644
+
+
+- name: "复制mysql.server"
+  shell: "cp  /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld"
+
+- name: "chkconfig --add mysqld"
+  shell: "chkconfig --add mysqld"
+
+- name: "chkconfig mysqld on"
+  shell: "chkconfig mysqld on"
+
+- name: "初始化mysql"
+  shell: "/usr/local/mysql/bin/mysqld --initialize --user=mysql --basedir=/usr/local/mysql --datadir=/datas/mysql/data --log-error=/datas/mysql/logs/mysqld.log"
+  args:
+    chdir: /usr/local/mysql
+
+- name: start mysql service
+  service: name=mysqld state=restarted
+
+
+- name: get password
+  shell: "grep 'temporary password' /datas/mysql/logs/mysqld.log| sed 's/.*root@localhost: //'"
+  register: mysql_root_password_temp
+
+- debug: 
+  var: mysql_root_password_temp
+
+- name: Set new password from temporary password
+  shell: '/usr/local/mysql/bin/mysql -e "SET PASSWORD = PASSWORD(''{{ mysql_root_password }}'');" --connect-expired-password -h 127.0.0.1 -uroot -p"{{ mysql_root_password_temp.stdout }}"'

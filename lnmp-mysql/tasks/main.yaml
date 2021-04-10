@@ -1,0 +1,5 @@
+- include_tasks: yum.yaml
+  when: installation_type == 'yum'
+
+- include_tasks: source.yaml
+  when: installation_type == 'source'

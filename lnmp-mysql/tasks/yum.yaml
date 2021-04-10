@@ -1,0 +1,23 @@
+- name: install epel
+  yum: name=epel-release state=latest
+   
+- name: install  mysql 官方源
+  yum: name="http://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm"
+  
+- name: install mysql
+  yum: name=mysql-community-server 
+
+
+- name: start mysqld
+  service: name=mysqld state=restarted
+
+
+- name: get password
+  shell: "grep 'temporary password'  /var/log/mysqld.log| sed 's/.*root@localhost: //'"
+  register: mysql_root_password_temp
+
+
+- name: Set new password from temporary password
+  shell: 'mysql -e "SET PASSWORD = PASSWORD(''{{ mysql_root_password }}'');" --connect-expired-password -h 127.0.0.1 -uroot -A -N'
+  environment:
+    MYSQL_PWD: "{{ mysql_root_password_temp.stdout }}"
