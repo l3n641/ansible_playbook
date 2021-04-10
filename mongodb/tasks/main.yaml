@@ -1,0 +1,31 @@
+- name: 复制文件
+  copy:
+    src: files/mongodb-org-4.2.repo
+    dest: /etc/yum.repos.d/
+    mode: 0777
+- name: Install mongodb-org package
+  yum:
+    name: mongodb-org
+    state: present
+
+- name: Start the service
+  service:
+    name: mongod
+    state: started
+
+- name: pip install pkg with requirements
+  pip:
+    name: pymongo
+    virtualenv_command: "{{python3_path}} -m venv"
+    virtualenv: /venv
+  vars:
+    ansible_python_interpreter: "{{ python3_path }}"
+
+- name: 创建admin的账号
+  community.mongodb.mongodb_user:
+    database: admin
+    name: "{{ mongo_root }}"
+    password: "{{ mongo_password }}"
+    state: present
+  vars:
+    ansible_python_interpreter: "/venv/bin/python3"
