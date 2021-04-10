@@ -1,0 +1,12 @@
+- name: install epel 
+  yum: name=epel-release state=latest
+
+- name: install nginx
+  yum: name=nginx state=latest
+
+- name: mkdir nginx root dir 
+  shell: mkdir -pv /data/www
+  
+- name: start nginx service
+  service: name=nginx state=restarted
+

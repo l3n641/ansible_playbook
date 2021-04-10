@@ -1,0 +1,15 @@
+---
+ - hosts: "{{host}}"
+   user: root
+   become: yes
+   become_method: sudo
+   become_user: root
+   gather_facts: no
+    
+   tasks:
+    - name: "安装nginx"
+      command: echo "hellow"
+   
+
+   roles:
+    - lnmp-nginx
