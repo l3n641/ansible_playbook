@@ -1,0 +1,93 @@
+- name: 创建存放代码的目录
+  file:
+    path: /datas/resource/opencart/
+    state: directory
+    mode: 0777
+    recurse: yes
+
+- name: 上传sql文件到服务器
+  copy:
+    src: files/opencart/opencart3.0.3.7.sql
+    dest: /datas/resource/opencart/opencart.sql
+    mode: 0777
+
+
+- name: 上传python requirements.txt 文件到服务器
+  copy:
+    src: files/requirements.txt
+    dest: /datas/resource/requirements.txt
+    mode: 0777
+
+- name: 上传cms文件到服务器
+  copy:
+    src: files/opencart/opencart-3.0.3.7.tar.gz
+    dest: /datas/resource/opencart/opencart-3.0.3.7.tar.gz
+    mode: 0777
+
+- name: 创建网站代码的目录
+  file:
+    path: "/datas/www/{{ domain }}"
+    state: directory
+    mode: 0777
+    recurse: yes
+
+- name: 解压 opencart源码包
+  unarchive:
+    src: /datas/resource/opencart/opencart-3.0.3.7.tar.gz
+    dest: "/datas/www/{{ domain }}"
+    owner: apache
+    group: apache
+    mode: 0777
+    copy: no
+
+- name: Install requirements
+  pip:
+    requirements: /datas/resource/requirements.txt
+    virtualenv_command: "{{python3_interpreter_path}} -m venv"
+    virtualenv: /venv
+
+- name: install opencart cms
+  opencart_install:
+    database_user: "{{ database_user }}"
+    database_password: "{{ database_password }}"
+    database_name: "{{ database_name }}"
+    database_port: "{{ database_port }}"
+    opencart_admin_account: "{{ opencart_admin_account }}"
+    opencart_admin_password: "{{ opencart_admin_password }}"
+    opencart_admin_email: "{{ opencart_admin_email }}"
+    opencart_db_prefix: "{{ opencart_db_prefix }}"
+    domain: "{{ domain }}"
+    dir_opencart: "/datas/www/{{ domain }}"
+    db_driver: "{{ db_driver }}"
+  vars:
+    ansible_python_interpreter: "/venv/bin/python3"
+
+- name: 创建上传图片共享目录
+  file:
+    src: "/datas/images"
+    dest: "/datas/www/{{ domain }}/image/catalog/share_images"
+    mode: 0777
+    state: link
+
+
+- name: 创建nginx日志目录
+  file:
+    path: "/datas/logs/nginx"
+    state: directory
+    mode: 0777
+    recurse: yes
+
+- name: 生成nginx 配置文件
+  template:
+    src: templates/site.conf
+    dest: "/etc/nginx/conf.d/{{domain}}.conf"
+    mode: '0644'
+  vars:
+    root_path: "/datas/www/{{domain}}"
+    site_port: "{{nginx_site_port}}"
+    server_name: "{{domain}}"
+
+- name: 重新启动nginx
+  service: name=nginx state=restarted
+
+
