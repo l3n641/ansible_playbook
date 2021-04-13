@@ -99,7 +99,16 @@
   vars:
     ansible_python_interpreter: "/venv/bin/python3"
 
-- name: 创建上传图片共享目录
+
+- name: 创建图片共享目录
+  file:
+    path: "/datas/images"
+    state: directory
+    mode: 0777
+    recurse: yes
+    force: yes
+
+- name: 创建link图片目录
   file:
     src: "/datas/images"
     dest: "/datas/www/{{ domain }}/image/catalog/share_images"
