@@ -1,0 +1,62 @@
+- name: install certbot
+  yum: name=certbot state=latest
+
+- name: Check that the dhparam.pem exists
+  stat:
+    path: /etc/ssl/certs/dhparam.pem
+  register: file_status
+
+- name: Check that if the file devnet.md not exists
+  shell: "openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048"
+  when: file_status.stat.exists == False
+
+- name: 创建.well-known目录
+  file:
+    path: /var/lib/letsencrypt/.well-known
+    state: directory
+    mode: 0777
+    owner: nginx
+    group: nginx
+    recurse: yes
+    force: no
+
+- name: 创建snippets目录
+  file:
+    path: /etc/nginx/snippets
+    state: directory
+    mode: 0777
+    recurse: yes
+    force: no
+
+- name: 上传letsencrypt.conf
+  copy:
+    src: files/letsencrypt.conf
+    dest: /etc/nginx/snippets/letsencrypt.conf
+    mode: 0666
+    force: "{{ update_resource }}"
+
+- name: 上传ssl.conf
+  copy:
+    src: files/ssl.conf
+    dest: /etc/nginx/snippets/ssl.conf
+    mode: 0666
+    force: "{{ update_resource }}"
+
+
+- name: 运行certbot
+  shell: "certbot certonly --agree-tos --email {{ acme_email }} --webroot -w /var/lib/letsencrypt/ -d {{ domain }} "
+
+
+
+- name: 重新生成nginx 配置文件
+  template:
+    src: templates/site.conf
+    dest: "/etc/nginx/conf.d/{{domain}}.conf"
+    mode: '0644'
+  vars:
+    root_path: "/datas/www/{{domain}}"
+    site_port: "{{nginx_site_port}}"
+    server_name: "{{domain}}"
+
+- name: 重新启动nginx
+  service: name=nginx state=restarted
