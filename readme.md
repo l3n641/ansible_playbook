@@ -31,7 +31,6 @@
   host:要安装的服务器名称
 
   ##安装opencart_cms
-  ansible-playbook install_cms.yml --extra-vars "host=test cms_type=opencart domain=test4.fxteam.top  python3_interpreter_path=/usr/local/python3/bin/python3 database_user=root database_password=qasx16mnb42*gp316hcxDje database_name=test4_opencart  database_port=3306 opencart_admin_account=admin opencart_admin_password=admin opencart_admin_email=111@qq.com  opencart_db_prefix=test_ db_driver=mpdo"
-
+  ansible-playbook install_cms.yml --extra-vars "host=test cms_type=opencart domain=test9.fxteam.top  python3_interpreter_path=/usr/local/python3/bin/python3 database_user=opencart_zhihu database_password=china999 database_name=test9_opencart  database_port=3306 opencart_admin_account=admin opencart_admin_password=admin opencart_admin_email=111@qq.com  opencart_db_prefix=test_ db_driver=mpdo db_login_user=root db_login_password=qasx16mnb42*gp316hcxDje"
   ##安装opencart_cms 上传商品插件
   ansible-playbook plugin_opencart_upload_product.yml --extra-vars "host=test domain=test5.fxteam.top"

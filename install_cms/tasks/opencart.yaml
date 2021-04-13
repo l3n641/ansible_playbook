@@ -10,6 +10,7 @@
     src: files/opencart/opencart3.0.3.7.sql
     dest: /datas/resource/opencart/opencart.sql
     mode: 0777
+    force: "{{ update_resource }}"
 
 
 - name: 上传python requirements.txt 文件到服务器
@@ -17,12 +18,20 @@
     src: files/requirements.txt
     dest: /datas/resource/requirements.txt
     mode: 0777
+    force: "{{ update_resource }}"
+
 
 - name: 上传cms文件到服务器
   copy:
     src: files/opencart/opencart-3.0.3.7.tar.gz
     dest: /datas/resource/opencart/opencart-3.0.3.7.tar.gz
     mode: 0777
+    force: "{{ update_resource }}"
+
+- name: 删除已经存在的网站目录
+  file:
+    path: "/datas/www/{{ domain }}"
+    state: absent
 
 - name: 创建网站代码的目录
   file:
@@ -30,6 +39,7 @@
     state: directory
     mode: 0777
     recurse: yes
+    force: yes
 
 - name: 解压 opencart源码包
   unarchive:
@@ -45,6 +55,33 @@
     requirements: /datas/resource/requirements.txt
     virtualenv_command: "{{python3_interpreter_path}} -m venv"
     virtualenv: /venv
+
+
+- name: Create a new database
+  community.mysql.mysql_db:
+    name: "{{ database_name }}"
+    login_host: "{{ db_login_host }}"
+    login_user: "{{ db_login_user }}"
+    login_password: "{{ db_login_password }}"
+    login_port: "{{ database_port }}"
+    state: present
+  vars:
+    ansible_python_interpreter: "/venv/bin/python3"
+
+
+- name: 创建mysql账号
+  mysql_user:
+    login_host: "{{ db_login_host }}"
+    login_user: "{{ db_login_user }}"
+    login_password: "{{ db_login_password }}"
+    login_port: "{{ database_port }}"
+    name: "{{ database_user }}"
+    password: "{{ database_password }}"
+    host: "localhost"
+    priv: "{{ database_name }}.*:ALL,GRANT"
+    state: "present"
+  vars:
+    ansible_python_interpreter: "/venv/bin/python3"
 
 - name: install opencart cms
   opencart_install:
