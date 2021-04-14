@@ -8,3 +8,4 @@ letsencrypt_csrs_dir: /etc/letsencrypt/csrs
 letsencrypt_certs_dir: /etc/letsencrypt/certs
 letsencrypt_account_key: /etc/letsencrypt/account/account.key
 update_resource: false
+nginx_site_port: 80

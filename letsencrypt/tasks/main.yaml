@@ -44,7 +44,7 @@
 
 
 - name: 运行certbot
-  shell: "certbot certonly --agree-tos --email {{ acme_email }} --webroot -w /var/lib/letsencrypt/ -d {{ domain }} "
+  shell: "certbot certonly --force-renewal --agree-tos --email {{ acme_email }} --webroot -w /var/lib/letsencrypt/ -d {{ domain }} "
 
 
 
