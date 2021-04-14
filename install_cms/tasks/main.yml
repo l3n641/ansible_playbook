@@ -1,3 +1,35 @@
+- name: 创建.well-known目录
+  file:
+    path: /var/lib/letsencrypt/.well-known
+    state: directory
+    mode: 0777
+    owner: nginx
+    group: nginx
+    recurse: yes
+    force: no
+
+- name: 创建snippets目录
+  file:
+    path: /etc/nginx/snippets
+    state: directory
+    mode: 0777
+    recurse: yes
+    force: no
+
+- name: 上传letsencrypt.conf
+  copy:
+    src: files/letsencrypt.conf
+    dest: /etc/nginx/snippets/letsencrypt.conf
+    mode: 0666
+    force: "{{ update_resource }}"
+
+- name: 上传ssl.conf
+  copy:
+    src: files/ssl.conf
+    dest: /etc/nginx/snippets/ssl.conf
+    mode: 0666
+    force: "{{ update_resource }}"
+
 - include_tasks: opencart.yaml
   when: cms_type == 'opencart'
 
