@@ -203,7 +203,7 @@ class InitConfigFile():
          define('HTTP_SERVER', 'http://{domain}/');
 
         // HTTPS
-         define('HTTPS_SERVER', 'http://{domain}/');
+         define('HTTPS_SERVER', 'https://{domain}/');
 
         // DIR
          define('DIR_APPLICATION', '{dir_application}');
@@ -240,8 +240,8 @@ class InitConfigFile():
          define('HTTP_CATALOG', 'http://{domain}/');
 
         // HTTPS
-         define('HTTPS_SERVER', 'http://{domain}/admin/');
-         define('HTTPS_CATALOG', 'http://{domain}/');
+         define('HTTPS_SERVER', 'https://{domain}/admin/');
+         define('HTTPS_CATALOG', 'https://{domain}/');
 
         // DIR
          define('DIR_APPLICATION', '{dir_application}');
