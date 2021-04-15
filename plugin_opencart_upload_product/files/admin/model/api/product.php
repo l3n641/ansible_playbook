@@ -1,5 +1,6 @@
 <?php
 include_once(DIR_APPLICATION . "model/catalog/product.php");
+include_once(__DIR__."/download.php");
 
 class ModelApiProduct extends ModelCatalogProduct
 {
@@ -138,6 +139,46 @@ class ModelApiProduct extends ModelCatalogProduct
         $dbCollectionName = "$db.product";
         $bulkWrite->insert($product_data);
         $manager->executeBulkWrite($dbCollectionName, $bulkWrite);
+    }
+
+     /**获取图片的保存信息
+     * @param $url
+     * @param $path
+     * @return array
+     */
+    public function getImageLocalPath($url, $path)
+    {
+        $dir_name = strtolower(substr(md5($url), 0, 4));
+        $abs_path = DIR_IMAGE . $path . $dir_name;
+
+        if (!file_exists($abs_path)) {
+            mkdir($abs_path, 0777, true);
+        }
+        $file_name = pathinfo(parse_url($url)["path"])["basename"];
+        $abs_path = $abs_path . '/' . $file_name;
+        $info = [
+            "absolute_path" => $abs_path,
+            "database_path" => $path . "$dir_name/" . $file_name,
+        ];
+        return $info;
+    }
+
+    public function batch_down_image($images,$error_file_path)
+    {
+        $down_list = [];
+        foreach ($images as $data) {
+            if (!file_exists($data[1])) {
+                $down_list[] = $data;
+            }
+        }
+
+        if (empty($down_list)) {
+            return 0;
+        }
+
+        $obj = new BatchImageDownLoad($down_list, 10, 10,$error_file_path);
+        $handle_num = $obj->download();
+        return $handle_num;
     }
 
 

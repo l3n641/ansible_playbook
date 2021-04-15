@@ -47,15 +47,20 @@ class ControllerApiProduct extends Controller
         $product = new Product($post_data["name"], $post_data["description"], $post_data["name"], $post_data["spu"], $post_data["spu"], $post_data["price"], $post_data["quantity"],
             $post_data["weight"], $main_picture, $category_full_ids);
 
+        $down_images = [];
+
         if ($color_options) {
             $attribute_id = $this->model_api_product_option->addProductAttribute("color");
             $color = new ProductOptionSelectorStructure("color", $attribute_id);
-
             foreach ($color_options as $option) {
                 if ($option["img"]) {
-                    $image = $this->model_api_product->downloadImage($option["img"], "catalog/share_images/");
+                    $image_info = $this->model_api_product->getImageLocalPath($option["img"], "catalog/share_images/");
+
+                    $image = $image_info["database_path"];
+                    $down_images[] = array($option["img"], $image_info["absolute_path"]);
+
                 } else {
-                    $image = $option["img"];
+                    $image = "";
                 }
 
                 $attribute_value_id = $this->model_api_product_option->addProductAttributeValue($attribute_id, $option["value"], $image);
@@ -72,7 +77,10 @@ class ControllerApiProduct extends Controller
 
             foreach ($size_options as $option) {
                 if (empty($color_options) && $option["img"]) {
-                    $image = $this->model_api_product->downloadImage($option["img"], "catalog/share_images/");
+                    $image_info = $this->model_api_product->getImageLocalPath($option["img"], "catalog/share_images/");
+
+                    $image = $image_info["database_path"];
+                    $down_images[] = array($option["img"], $image_info["absolute_path"]);
                 } else {
                     $image = "";
                 }
@@ -86,11 +94,15 @@ class ControllerApiProduct extends Controller
         }
 
         foreach ($post_data["extra_images"] as $img) {
-            $image = $this->model_api_product->downloadImage($img, "catalog/share_images/");
+            $image_info = $this->model_api_product->getImageLocalPath($img, "catalog/share_images/");
+
+            $image = $image_info["database_path"];
+            $down_images[] = array($option["img"], $image_info["absolute_path"]);
             $product->addImg($image);
 
         }
 
+        $this->model_api_product->batch_down_image($down_images,BATCH_DOWNLOAD_ERROR_LOG_PATH);
 
         $product_id = $this->model_api_product->addProductApi($product,$post_data["product_id"]);
         if ($product_id) {
