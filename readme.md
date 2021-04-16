@@ -7,12 +7,15 @@
   mysql_root_password: 初始化的时候root 账号的密码 
 
 
-  ##mysql 添加用户
-  ansible-playbook mysql_add_user.yml --extra-vars "host=test login_password=qasx16mnb42*gp316hcxDje user_name=l3n641 password=qasx16mnb42*gp316hcxDje_1"
-  host:要安装的服务器名称 
-  login_password: root 密码
+  ##mysql 添加数据库和对应的用户
+  ansible-playbook mysql_add_database.yml --extra-vars "host=test database_name=test123 db_login_user=root  db_login_password=qasx16mnb42*gp316hcxDje  db_login_host=127.0.0.1  user_name=admin_4 password=qasx16mnb42*gp316hcxDje_1 python3_path=/venv/bin/python3  host:要安装的服务器名称
+  database_name: 要创建的数据库名称
+  db_login_user: 管理员账号
+  db_login_password: 管理员密码
+  db_login_host: 127.0.0.1
   user_name: 要注册的账号
   password: 新账号的密码
+  python3_path: 装有pymysql的python路径
 
   ##安装php 服务
   ansible-playbook php.yml --extra-vars "host=test"

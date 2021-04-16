@@ -1,0 +1,60 @@
+---
+- hosts: "{{host}}"
+  user: root
+  become: yes
+  become_method: sudo
+  become_user: root
+  gather_facts: no
+  vars:
+    login_port: 3306
+    login_user: root
+    login_host: "127.0.0.1"
+
+  tasks:
+    - name: pip install pkg with requirements
+      pip:
+        name: PyMySQL
+        virtualenv_command: "{{python3_path}} -m venv"
+        virtualenv: /venv
+      vars:
+        ansible_python_interpreter: "{{ python3_path }}"
+
+    - name: Create a new database
+      community.mysql.mysql_db:
+        name: "{{ database_name }}"
+        login_host: "{{ login_host }}"
+        login_user: "{{ login_user }}"
+        login_password: "{{ db_login_password }}"
+        login_port: "{{ login_port }}"
+        state: present
+      vars:
+        ansible_python_interpreter: "{{ python3_path }}"
+
+    - name: Create a database global_data
+      community.mysql.mysql_db:
+        name: "global_data"
+        login_host: "{{ db_login_host }}"
+        login_user: "{{ db_login_user }}"
+        login_password: "{{ db_login_password }}"
+        login_port: "{{ login_port }}"
+        state: present
+      vars:
+        ansible_python_interpreter: "/venv/bin/python3"
+
+
+
+    - name: 创建mysql账号
+      mysql_user:
+        login_host: "{{ login_host }}"
+        login_user: "{{ login_user }}"
+        login_password: "{{ db_login_password }}"
+        login_port: "{{ login_port }}"
+        name: "{{ user_name }}"
+        password: "{{ password }}"
+        host: "localhost"
+        priv: "{{ database_name }}.*:ALL,GRANT/global_data.*:ALL,GRANT"
+
+
+        state: "present"
+      vars:
+        ansible_python_interpreter: "{{ python3_path }}"
