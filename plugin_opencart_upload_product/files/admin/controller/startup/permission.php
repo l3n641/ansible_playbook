@@ -1,4 +1,6 @@
 <?php
+require_once(DIR_APPLICATION . "custom_config.php");
+
 class ControllerStartupPermission extends Controller {
 	public function index() {
 		if (isset($this->request->get['route'])) {
@@ -44,8 +46,9 @@ class ControllerStartupPermission extends Controller {
 				'common/reset',
 				'error/not_found',
 				'error/permission',
-                'api/product',
 			);
+			$ignore=array_merge($ignore,CUSTOM_CONTROLLER_PERMISSION);
+
 			if (!in_array($route, $ignore) && !$this->user->hasPermission('access', $route)) {
 				return new Action('error/permission');
 			}

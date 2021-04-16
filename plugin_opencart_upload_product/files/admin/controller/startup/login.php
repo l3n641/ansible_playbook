@@ -1,4 +1,6 @@
 <?php
+require_once(DIR_APPLICATION . "custom_config.php");
+
 class ControllerStartupLogin extends Controller {
 	public function index() {
 		$route = isset($this->request->get['route']) ? $this->request->get['route'] : '';
@@ -7,8 +9,8 @@ class ControllerStartupLogin extends Controller {
 			'common/login',
 			'common/forgotten',
 			'common/reset',
-            'api/product/add',
 		);
+		$ignore=array_merge($ignore,CUSTOM_IGNORE_ACTION);
 
 		// User
 		$this->registry->set('user', new Cart\User($this->registry));
@@ -25,8 +27,9 @@ class ControllerStartupLogin extends Controller {
 				'common/reset',
 				'error/not_found',
 				'error/permission',
-                'api/product/add',
 			);
+			$ignore=array_merge($ignore,CUSTOM_IGNORE_ACTION);
+
 
 			if (!in_array($route, $ignore) && (!isset($this->request->get['user_token']) || !isset($this->session->data['user_token']) || ($this->request->get['user_token'] != $this->session->data['user_token']))) {
 				return new Action('common/login');
