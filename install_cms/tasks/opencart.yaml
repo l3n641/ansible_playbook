@@ -50,38 +50,6 @@
     mode: 0777
     copy: no
 
-- name: Install requirements
-  pip:
-    requirements: /datas/resource/requirements.txt
-    virtualenv_command: "{{python3_interpreter_path}} -m venv"
-    virtualenv: /venv
-
-
-- name: Create a new database
-  community.mysql.mysql_db:
-    name: "{{ database_name }}"
-    login_host: "{{ db_login_host }}"
-    login_user: "{{ db_login_user }}"
-    login_password: "{{ db_login_password }}"
-    login_port: "{{ database_port }}"
-    state: present
-  vars:
-    ansible_python_interpreter: "/venv/bin/python3"
-
-
-- name: 创建mysql账号
-  mysql_user:
-    login_host: "{{ db_login_host }}"
-    login_user: "{{ db_login_user }}"
-    login_password: "{{ db_login_password }}"
-    login_port: "{{ database_port }}"
-    name: "{{ database_user }}"
-    password: "{{ database_password }}"
-    host: "localhost"
-    priv: "{{ database_name }}.*:ALL,GRANT"
-    state: "present"
-  vars:
-    ansible_python_interpreter: "/venv/bin/python3"
 
 - name: install opencart cms
   opencart_install:
@@ -100,14 +68,6 @@
     ansible_python_interpreter: "/venv/bin/python3"
 
 
-- name: 创建图片共享目录
-  file:
-    path: "/datas/images"
-    state: directory
-    mode: 0777
-    recurse: yes
-    force: yes
-
 - name: 创建link图片目录
   file:
     src: "/datas/images"
@@ -115,13 +75,6 @@
     mode: 0777
     state: link
 
-
-- name: 创建nginx日志目录
-  file:
-    path: "/datas/logs/nginx"
-    state: directory
-    mode: 0777
-    recurse: yes
 
 - name: 生成nginx 配置文件
   template:
