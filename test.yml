@@ -1,0 +1,20 @@
+---
+    - hosts: "{{host}}"
+      user: l3n641
+      become: yes
+      become_method: sudo
+      become_user: root
+      gather_facts: no
+   
+      tasks:
+        - name: shell test cd
+          shell: "pwd"
+          args:
+           chdir: /etc
+   
+          register: dir
+        
+        - debug:
+           var: dir
+
+
