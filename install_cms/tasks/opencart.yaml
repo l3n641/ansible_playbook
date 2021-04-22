@@ -63,6 +63,7 @@
     root_path: "/datas/www/{{domain}}"
     site_port: "{{nginx_site_port}}"
     server_name: "{{domain}}"
+    fastcgi_pass: "{{ fastcgi_pass }}"
 
 - name: 重新启动nginx
   service: name=nginx state=restarted
