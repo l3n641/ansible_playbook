@@ -1,40 +1,18 @@
-- name: 复制admin 目录
+- name: 复制自定义sql文件
   copy:
-    src: files/opencart/admin/
-    dest: /datas/www/{{domain}}/admin/
+    src: files/custom.sql
+    dest: /tmp/custom.sql
     mode: 0777
 
-
-- name: 复制catalog文件
-  copy:
-    src: files/opencart/catalog/
-    dest: /datas/www/{{domain}}/catalog
-    mode: 0777
-
-
-- name: 复制配置模板
-  template:
-    src: templates/custom_config.php.j2
-    dest: /datas/www/{{domain}}/admin/custom_config.php
-    mode: 0755
-
-
-
-- name: 复制sql文件
-    copy:
-      src: /
-      dest: /tmp/user.sql
-      mode: 0777
-
-    - name: shell test cd
-      community.mysql.mysql_db:
-        state: import
-        name: "global_data"
-        login_host: "127.0.0.1"
-        login_user: "root"
-        login_password: "qasx16mnb42*gp316hcxDje"
-        login_port: "3306"
-        encoding: utf8mb4
-        target: /tmp/user.sql
-      vars:
-        ansible_python_interpreter: "/venv/bin/python3"
+- name: 执行自定义sql语句
+  community.mysql.mysql_db:
+    state: import
+    name: "global_data"
+    login_host: "{{ db_login_host }}"
+    login_user: "{{ db_login_user }}"
+    login_password: "{{ db_login_password }}"
+    login_port: "{{ database_port }}"
+    encoding: utf8mb4
+    target: /tmp/custom.sql
+  vars:
+    ansible_python_interpreter: "/venv/bin/python3"

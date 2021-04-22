@@ -1,2 +1,4 @@
 share_images: catalog/share_images/
 batch_download_error_log_path: /datas/logs/batch_download_error.log
+db_login_host: 127.0.01
+database_port: 3306
