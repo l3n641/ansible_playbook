@@ -1,0 +1,32 @@
+- name: install epel
+  yum: name=epel-release state=latest
+
+- name: install  http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+  yum: name="http://rpms.remirepo.net/enterprise/remi-release-7.rpm"
+
+- name: install php
+  yum: name={{ item }} state=latest
+  with_items:
+    - php56-php-fpm
+    - php56-php-pdo
+    - php56-php-mbstring
+    - php56-php-mcrypt
+    - php56-php-gd
+    - php56-php-pecl-crypto
+    - php56-php-pecl-zip
+    - php56-php-cli
+    - php56-mysqlnd-qc-panel
+    - php56-php-mysqlnd
+    - php56-php-pecl-mongodb
+    - php56-php-xml
+
+- name: 上传www.conf文件到服务器
+  copy:
+    src: files/www.conf
+    dest: /etc/opt/remi/php56/php-fpm.d/www.conf
+    mode: 0662
+
+
+- name: start php56-php-fpm
+  service: name=php56-php-fpm state=restarted
+
