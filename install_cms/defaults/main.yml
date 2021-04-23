@@ -2,4 +2,5 @@ nginx_site_port: 80
 db_login_host: 127.0.01
 update_resource: false
 database_port: 3306
-fastcgi_pass: 127.0.0.1:9000
+php_fastcgi_pass: 127.0.0.1:9000
+nginx_rewrite_rule: ""
