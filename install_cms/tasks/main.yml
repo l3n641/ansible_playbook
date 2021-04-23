@@ -117,5 +117,7 @@
     force: yes
 
 - include_tasks: opencart.yaml
+  vars:
+    cms_download_url: "http://qiniu.fxteam.top/opencart_3.0.3.7.tar"
   when: cms_type == 'opencart'
 

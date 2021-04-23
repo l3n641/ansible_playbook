@@ -5,23 +5,36 @@
     mode: 0777
     recurse: yes
 
-- name: 上传sql文件到服务器
-  copy:
-    src: files/opencart/opencart3.0.3.7.sql
-    dest: /datas/resource/opencart/opencart.sql
-    mode: 0777
-    force: "{{ update_resource }}"
 
-- name: 上传cms文件到服务器
+- name: 当load_data_online为yes的时候,线上下载安装包
+  get_url:
+    validate_certs: no
+    url: "{{ cms_download_url }}"
+    dest: /datas/resource/opencart/opencart_3.0.3.7.tar
+    mode: 0755
+    force: "{{ update_resource }}"
+  when: load_data_online == 'yes'
+
+- name: 当load_data_online为no的时候,上传安装包
   copy:
-    src: files/opencart/opencart-3.0.3.7.tar.gz
-    dest: /datas/resource/opencart/opencart-3.0.3.7.tar.gz
+    src: files/opencart_3.0.3.7.tar
+    dest: /datas/resource/opencart/
     mode: 0777
     force: "{{ update_resource }}"
+  when: load_data_online == 'no'
+
+- name: 解压下载tar包
+  unarchive:
+    src: /datas/resource/opencart/opencart_3.0.3.7.tar
+    dest: "/datas/resource/opencart/"
+    owner: apache
+    group: apache
+    mode: 0777
+    copy: no
 
 - name: 解压 opencart源码包
   unarchive:
-    src: /datas/resource/opencart/opencart-3.0.3.7.tar.gz
+    src: /datas/resource/opencart/opencart_3.0.3.7/opencart-3.0.3.7.tar.gz
     dest: "/datas/www/{{ domain }}"
     owner: apache
     group: apache
@@ -42,6 +55,7 @@
     domain: "{{ domain }}"
     dir_opencart: "/datas/www/{{ domain }}"
     db_driver: "{{ db_driver }}"
+    sql_file_path: "/datas/resource/opencart/opencart_3.0.3.7/opencart3.0.3.7.sql"
   vars:
     ansible_python_interpreter: "/venv/bin/python3"
 
