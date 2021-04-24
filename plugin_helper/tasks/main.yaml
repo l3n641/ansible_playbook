@@ -16,3 +16,13 @@
     target: /tmp/custom.sql
   vars:
     ansible_python_interpreter: "/venv/bin/python3"
+
+
+- include_tasks: opencart3/index.yaml
+  when: cms_type == 'opencart'
+
+
+- include_tasks: opencart2/index.yaml
+  vars:
+    admin_dir: "ourwebmag2018"
+  when: cms_type == 'opencart_2'
