@@ -1,0 +1,19 @@
+- name: 复制admin 目录
+  copy:
+    src: files/opencart/admin/
+    dest: /datas/www/{{domain}}/admin/
+    mode: 0777
+
+- name: 复制catalog文件
+  copy:
+    src: files/opencart/catalog/
+    dest: /datas/www/{{domain}}/catalog
+    mode: 0777
+
+- name: 复制配置模板
+  template:
+    src: templates/custom_config.php.j2
+    dest: /datas/www/{{domain}}/admin/custom_config.php
+    mode: 0755
+
+
