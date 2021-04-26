@@ -74,7 +74,7 @@
 
 - name: 生成nginx 配置文件
   template:
-    src: templates/site.conf
+    src: templates/opencart2/site.conf
     dest: "/etc/nginx/conf.d/{{domain}}.conf"
     mode: '0644'
   vars:
