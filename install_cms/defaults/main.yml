@@ -3,7 +3,7 @@ db_login_host: 127.0.01
 update_resource: false
 database_port: 3306
 php_fastcgi_pass: 127.0.0.1:9000
-nginx_rewrite_rule: ""
+rewrite_rule: ""
 load_data_online: "yes"
 cms_download_url: ""
 admin_dir: "admin"

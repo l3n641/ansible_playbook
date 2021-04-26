@@ -78,7 +78,6 @@
     site_port: "{{nginx_site_port}}"
     server_name: "{{domain}}"
     nginx_fastcgi_pass: "{{ php_fastcgi_pass }}"
-    rewrite_rule: "{{ nginx_rewrite_rule}}"
 
 - name: 重新启动nginx
   service: name=nginx state=restarted
