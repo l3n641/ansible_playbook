@@ -13,7 +13,7 @@
 
 - name: 复制配置模板
   template:
-    src: templates/opencart2/custom_config.php.j2
+    src: files/opencart2/custom_config.php
     dest: /datas/www/{{domain}}/{{ admin_dir }}/custom_config.php
     mode: 0755
 
