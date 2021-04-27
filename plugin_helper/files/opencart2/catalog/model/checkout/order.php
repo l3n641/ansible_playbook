@@ -830,18 +830,22 @@ class ModelCheckoutOrder extends Model {
 		$global_order_id = $this->db->getLastId();
 
 
-		$order_products = $this->getOrderProducts($order_id);
+		$order_products_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_product WHERE order_id = '" . (int)$order_id . "'");
 
-		foreach($order_products as $order_product) {
+		foreach($order_products_query->rows as $order_product) {
 
-			$order_options = $this->getOrderOptions($order_id, $order_product['order_product_id']);
+			$order_options_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_option WHERE order_id = '" . (int)$order_id . "' AND order_product_id = '" . $product['order_product_id'] . "'");
+
 			$product_attr=[];
-			foreach ($order_options as $order_option) {
+
+			foreach ($order_options_query->rows as $order_option) {
 				$key=$order_option["name"];
 				$product_attr[$key]=$order_option["value"];
 			}
+
 			$product_sql="INSERT INTO global_data.`order_products` SET order_id=%d,product_id=%d,name='%s',model='%s',quantity=%d,color='%s',size='%s',
 						price='%s',total='%s',tax='%s',reward='%d'";
+
 			$sql=sprintf($product_sql,$global_order_id,$order_product["product_id"],$this->db->escape($order_product["name"]),$order_product["model"],$order_product["quantity"],
 						isset($product_attr["color"])?$product_attr["color"]:null,isset($product_attr["size"])?$product_attr["size"]:null,$order_product["price"],$order_product["total"],$order_product["tax"],$order_product["reward"]);
 
