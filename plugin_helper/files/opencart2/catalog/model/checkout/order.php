@@ -834,7 +834,7 @@ class ModelCheckoutOrder extends Model {
 
 		foreach($order_products_query->rows as $order_product) {
 
-			$order_options_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_option WHERE order_id = '" . (int)$order_id . "' AND order_product_id = '" . $product['order_product_id'] . "'");
+			$order_options_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_option WHERE order_id = '" . (int)$order_id . "' AND order_product_id = '" . $order_product['order_product_id'] . "'");
 
 			$product_attr=[];
 
