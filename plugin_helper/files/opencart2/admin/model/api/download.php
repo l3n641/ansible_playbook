@@ -101,7 +101,7 @@ class BatchImageDownLoad
 // 循环设定数量
         foreach ($download_config as $k => $config) {
             $ch[$k] = curl_init();
-            $fp[$k] = fopen($config[1], 'a');
+            $fp[$k] = fopen($config[1], 'w');
 
             curl_setopt($ch[$k], CURLOPT_URL, $config[0]);
             curl_setopt($ch[$k], CURLOPT_FILE, $fp[$k]);
