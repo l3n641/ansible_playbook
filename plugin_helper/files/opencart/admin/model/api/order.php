@@ -1,8 +1,8 @@
 <?php
+
 include_once(DIR_APPLICATION . "model/sale/order.php");
 
-class ModelApiOrder extends ModelSaleOrder
-{
+class ModelApiOrder extends ModelSaleOrder{
 
    public function getProcessingOrder(){
         $sql = sprintf("select *  from global_data.`orders`  where order_status_id=%d ",1);
@@ -29,11 +29,9 @@ class ModelApiOrder extends ModelSaleOrder
             ];
 
            }
-
             $order["products"]=$products;
             $ordes[]=$order;
            }
-
 
         }
         return $ordes;
@@ -55,7 +53,7 @@ class ModelApiOrder extends ModelSaleOrder
 		$order_id=intval($order_id);
 		$order_info = $this->getOrder($order_id);
         $global_order=$this->getOrderBysn($order_sn);
-		if ($order_info && $global_order && $global_order[0]["order_id"]==$order_id) {
+		if ($order_info && $global_order && $global_order[0]["order_id"]==$order_id&& $global_order[0]["store_url"]==$order_info["store_url"]) {
 
 
 				// Add commission if sale is linked to affiliate referral.
@@ -113,5 +111,6 @@ class ModelApiOrder extends ModelSaleOrder
 
 		}
 	}
+
 
 }
