@@ -60,3 +60,17 @@
 
 - name: 重新启动nginx
   service: name=nginx state=restarted
+
+
+- name: 删除旧定时任务
+  ansible.builtin.cron:
+    name: "update lets encrypt"
+    state: absent
+
+- name: Creates a cron file under /etc/cron.d
+  ansible.builtin.cron:
+    name: "update lets encrypt"
+    hour: "12"
+    user: root
+    job: 'root test -x /usr/bin/certbot -a \! -d /run/systemd/system && perl -e "sleep int(rand(3600))" && certbot -q renew --renew-hook "systemctl reload nginx"'
+
