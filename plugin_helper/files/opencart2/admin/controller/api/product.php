@@ -96,7 +96,7 @@ class ControllerApiProduct extends CommonController
             $image_info = $this->model_api_product->getImageLocalPath($img, "catalog/share_images/");
 
             $image = $image_info["database_path"];
-            $down_images[] = array($option["img"], $image_info["absolute_path"]);
+            $down_images[] = array($img, $image_info["absolute_path"]);
             $product->addImg($image);
 
         }
