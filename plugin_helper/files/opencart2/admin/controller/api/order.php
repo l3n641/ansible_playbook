@@ -1,8 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . '/common.php');
-require_once(DIR_APPLICATION . "custom_config.php");
 
-class ControllerApiOrder extends Controller
+class ControllerApiOrder extends CommonController
 {
     public function __construct($registry)
     {
