@@ -31,6 +31,13 @@
     force: "{{ update_resource }}"
 
 
+- name: 创建resouce目录
+  file:
+    path: /datas/resource
+    state: directory
+    mode: 0777
+    recurse: yes
+
 - name: 上传python requirements.txt 文件到服务器
   copy:
     src: files/requirements.txt
