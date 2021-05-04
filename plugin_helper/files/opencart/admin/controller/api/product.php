@@ -2,9 +2,8 @@
 require_once(dirname(__FILE__) . '/common.php');
 require_once(DIR_APPLICATION . "model/api/structure/product_option.php");
 require_once(DIR_APPLICATION . "model/api/structure/product.php");
-require_once(DIR_APPLICATION . "custom_config.php");
 
-class ControllerApiProduct extends Controller
+class ControllerApiProduct extends CommonController
 {
 
     public function __construct($registry)
