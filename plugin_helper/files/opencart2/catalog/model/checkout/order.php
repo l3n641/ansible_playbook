@@ -863,7 +863,6 @@ class ModelCheckoutOrder extends Model {
 			$sql=sprintf($product_is_exist,$global_order_id,$order_product["product_id"],$order_product["model"],$order_product["quantity"],$color,$size);
 
 			$product=$this->db->query($sql);
-			var_dump($sql);
 			if ($product->rows){
 				continue;
 			}
