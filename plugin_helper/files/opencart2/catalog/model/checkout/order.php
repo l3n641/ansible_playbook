@@ -821,23 +821,31 @@ class ModelCheckoutOrder extends Model {
 		if (!$order_data){
 			return false;
 		}
+
 		$store_name=$this->db->escape($order_data['store_name']);
 		$store_url= $this->db->escape($order_data['store_url']);
 		$global_order_sql="select * from  global_data.`orders` where order_id={$order_data['order_id']} and store_id ={$order_data['store_id']} and store_url='{$store_url}'";
 		$data=$this->db->query($global_order_sql);
-		if ($data->rows){
-			return true;
+
+		if (!$data->rows){
+
+			$order_sn=uniqid();
+
+			$order_sql="INSERT INTO global_data.`orders` SET order_sn='$order_sn',order_status_id={$order_data['order_status_id']},order_id={$order_data['order_id']},fax='{$order_data['fax']}', invoice_prefix = '" . $this->db->escape($order_data['invoice_prefix']) . "', store_id = '" . (int)$order_data['store_id'] . "', store_name = '" . $this->db->escape($order_data['store_name']) . "', store_url = '" . $this->db->escape($order_data['store_url']) . "', customer_id = '" . (int)$order_data['customer_id'] . "', customer_group_id = '" . (int)$order_data['customer_group_id'] . "', firstname = '" . $this->db->escape($order_data['firstname']) . "', lastname = '" . $this->db->escape($order_data['lastname']) . "', email = '" . $this->db->escape($order_data['email']) . "', telephone = '" . $this->db->escape($order_data['telephone']) . "', custom_field = '" . $this->db->escape(isset($order_data['custom_field']) ? json_encode($order_data['custom_field']) : '') . "', payment_firstname = '" . $this->db->escape($order_data['payment_firstname']) . "', payment_lastname = '" . $this->db->escape($order_data['payment_lastname']) . "', payment_company = '" . $this->db->escape($order_data['payment_company']) . "', payment_address_1 = '" . $this->db->escape($order_data['payment_address_1']) . "', payment_address_2 = '" . $this->db->escape($order_data['payment_address_2']) . "', payment_city = '" . $this->db->escape($order_data['payment_city']) . "', payment_postcode = '" . $this->db->escape($order_data['payment_postcode']) . "', payment_country = '" . $this->db->escape($order_data['payment_country']) . "', payment_country_id = '" . (int)$order_data['payment_country_id'] . "', payment_zone = '" . $this->db->escape($order_data['payment_zone']) . "', payment_zone_id = '" . (int)$order_data['payment_zone_id'] . "', payment_address_format = '" . $this->db->escape($order_data['payment_address_format']) . "', payment_custom_field = '" . $this->db->escape(isset($order_data['payment_custom_field']) ? json_encode($order_data['payment_custom_field']) : '') . "', payment_method = '" . $this->db->escape($order_data['payment_method']) . "', payment_code = '" . $this->db->escape($order_data['payment_code']) . "', shipping_firstname = '" . $this->db->escape($order_data['shipping_firstname']) . "', shipping_lastname = '" . $this->db->escape($order_data['shipping_lastname']) . "', shipping_company = '" . $this->db->escape($order_data['shipping_company']) . "', shipping_address_1 = '" . $this->db->escape($order_data['shipping_address_1']) . "', shipping_address_2 = '" . $this->db->escape($order_data['shipping_address_2']) . "', shipping_city = '" . $this->db->escape($order_data['shipping_city']) . "', shipping_postcode = '" . $this->db->escape($order_data['shipping_postcode']) . "', shipping_country = '" . $this->db->escape($order_data['shipping_country']) . "', shipping_country_id = '" . (int)$order_data['shipping_country_id'] . "', shipping_zone = '" . $this->db->escape($order_data['shipping_zone']) . "', shipping_zone_id = '" . (int)$order_data['shipping_zone_id'] . "', shipping_address_format = '" . $this->db->escape($order_data['shipping_address_format']) . "', shipping_custom_field = '" . $this->db->escape(isset($order_data['shipping_custom_field']) ? json_encode($order_data['shipping_custom_field']) : '') . "', shipping_method = '" . $this->db->escape($order_data['shipping_method']) . "', shipping_code = '" . $this->db->escape($order_data['shipping_code']) . "', comment = '" . $this->db->escape($order_data['comment']) . "', total = '" . (float)$order_data['total'] . "', affiliate_id = '" . (int)$order_data['affiliate_id'] . "', commission = '" . (float)$order_data['commission'] . "', marketing_id = '" . (int)$order_data['marketing_id'] . "', tracking = '" . $this->db->escape($order_data['tracking']) . "', language_id = '" . (int)$order_data['language_id'] . "', currency_id = '" . (int)$order_data['currency_id'] . "', currency_code = '" . $this->db->escape($order_data['currency_code']) . "', currency_value = '" . (float)$order_data['currency_value'] . "', ip = '" . $this->db->escape($order_data['ip']) . "', forwarded_ip = '" .  $this->db->escape($order_data['forwarded_ip']) . "', user_agent = '" . $this->db->escape($order_data['user_agent']) . "', accept_language = '" . $this->db->escape($order_data['accept_language']) . "', date_added = NOW(), date_modified = NOW()";
+			$this->db->query($order_sql);
+			$global_order_id = $this->db->getLastId();
+
+		}else{
+			$global_order_id=$data->rows[0]["id"];
 		}
-		$order_sn=uniqid();
-
-		$order_sql="INSERT INTO global_data.`orders` SET order_sn='$order_sn',order_status_id={$order_data['order_status_id']},order_id={$order_data['order_id']},fax='{$order_data['fax']}', invoice_prefix = '" . $this->db->escape($order_data['invoice_prefix']) . "', store_id = '" . (int)$order_data['store_id'] . "', store_name = '" . $this->db->escape($order_data['store_name']) . "', store_url = '" . $this->db->escape($order_data['store_url']) . "', customer_id = '" . (int)$order_data['customer_id'] . "', customer_group_id = '" . (int)$order_data['customer_group_id'] . "', firstname = '" . $this->db->escape($order_data['firstname']) . "', lastname = '" . $this->db->escape($order_data['lastname']) . "', email = '" . $this->db->escape($order_data['email']) . "', telephone = '" . $this->db->escape($order_data['telephone']) . "', custom_field = '" . $this->db->escape(isset($order_data['custom_field']) ? json_encode($order_data['custom_field']) : '') . "', payment_firstname = '" . $this->db->escape($order_data['payment_firstname']) . "', payment_lastname = '" . $this->db->escape($order_data['payment_lastname']) . "', payment_company = '" . $this->db->escape($order_data['payment_company']) . "', payment_address_1 = '" . $this->db->escape($order_data['payment_address_1']) . "', payment_address_2 = '" . $this->db->escape($order_data['payment_address_2']) . "', payment_city = '" . $this->db->escape($order_data['payment_city']) . "', payment_postcode = '" . $this->db->escape($order_data['payment_postcode']) . "', payment_country = '" . $this->db->escape($order_data['payment_country']) . "', payment_country_id = '" . (int)$order_data['payment_country_id'] . "', payment_zone = '" . $this->db->escape($order_data['payment_zone']) . "', payment_zone_id = '" . (int)$order_data['payment_zone_id'] . "', payment_address_format = '" . $this->db->escape($order_data['payment_address_format']) . "', payment_custom_field = '" . $this->db->escape(isset($order_data['payment_custom_field']) ? json_encode($order_data['payment_custom_field']) : '') . "', payment_method = '" . $this->db->escape($order_data['payment_method']) . "', payment_code = '" . $this->db->escape($order_data['payment_code']) . "', shipping_firstname = '" . $this->db->escape($order_data['shipping_firstname']) . "', shipping_lastname = '" . $this->db->escape($order_data['shipping_lastname']) . "', shipping_company = '" . $this->db->escape($order_data['shipping_company']) . "', shipping_address_1 = '" . $this->db->escape($order_data['shipping_address_1']) . "', shipping_address_2 = '" . $this->db->escape($order_data['shipping_address_2']) . "', shipping_city = '" . $this->db->escape($order_data['shipping_city']) . "', shipping_postcode = '" . $this->db->escape($order_data['shipping_postcode']) . "', shipping_country = '" . $this->db->escape($order_data['shipping_country']) . "', shipping_country_id = '" . (int)$order_data['shipping_country_id'] . "', shipping_zone = '" . $this->db->escape($order_data['shipping_zone']) . "', shipping_zone_id = '" . (int)$order_data['shipping_zone_id'] . "', shipping_address_format = '" . $this->db->escape($order_data['shipping_address_format']) . "', shipping_custom_field = '" . $this->db->escape(isset($order_data['shipping_custom_field']) ? json_encode($order_data['shipping_custom_field']) : '') . "', shipping_method = '" . $this->db->escape($order_data['shipping_method']) . "', shipping_code = '" . $this->db->escape($order_data['shipping_code']) . "', comment = '" . $this->db->escape($order_data['comment']) . "', total = '" . (float)$order_data['total'] . "', affiliate_id = '" . (int)$order_data['affiliate_id'] . "', commission = '" . (float)$order_data['commission'] . "', marketing_id = '" . (int)$order_data['marketing_id'] . "', tracking = '" . $this->db->escape($order_data['tracking']) . "', language_id = '" . (int)$order_data['language_id'] . "', currency_id = '" . (int)$order_data['currency_id'] . "', currency_code = '" . $this->db->escape($order_data['currency_code']) . "', currency_value = '" . (float)$order_data['currency_value'] . "', ip = '" . $this->db->escape($order_data['ip']) . "', forwarded_ip = '" .  $this->db->escape($order_data['forwarded_ip']) . "', user_agent = '" . $this->db->escape($order_data['user_agent']) . "', accept_language = '" . $this->db->escape($order_data['accept_language']) . "', date_added = NOW(), date_modified = NOW()";
-		$this->db->query($order_sql);
-		$global_order_id = $this->db->getLastId();
-
 
 		$order_products_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_product WHERE order_id = '" . (int)$order_id . "'");
 
+
+
 		foreach($order_products_query->rows as $order_product) {
+
+
 
 			$order_options_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_option WHERE order_id = '" . (int)$order_id . "' AND order_product_id = '" . $order_product['order_product_id'] . "'");
 
@@ -847,12 +855,25 @@ class ModelCheckoutOrder extends Model {
 				$key=$order_option["name"];
 				$product_attr[$key]=$order_option["value"];
 			}
+			$color=isset($product_attr["color"])?$this->db->escape($product_attr["color"]):null;
+			$size=isset($product_attr["size"])?$this->db->escape($product_attr["size"]):null;
+
+			$product_is_exist="SELECT  * FROM  global_data.`order_products` Where order_id=%d AND product_id=%d AND model='%s' AND quantity=%d AND color='%s' AND size='%s' ";
+
+			$sql=sprintf($product_is_exist,$global_order_id,$order_product["product_id"],$order_product["model"],$order_product["quantity"],$color,$size);
+
+			$product=$this->db->query($sql);
+			var_dump($sql);
+			if ($product->rows){
+				continue;
+			}
+
 
 			$product_sql="INSERT INTO global_data.`order_products` SET order_id=%d,product_id=%d,name='%s',model='%s',quantity=%d,color='%s',size='%s',
 						price='%s',total='%s',tax='%s',reward='%d'";
 
 			$sql=sprintf($product_sql,$global_order_id,$order_product["product_id"],$this->db->escape($order_product["name"]),$order_product["model"],$order_product["quantity"],
-						isset($product_attr["color"])?$product_attr["color"]:null,isset($product_attr["size"])?$product_attr["size"]:null,$order_product["price"],$order_product["total"],$order_product["tax"],$order_product["reward"]);
+						$color,$size,$order_product["price"],$order_product["total"],$order_product["tax"],$order_product["reward"]);
 
 			$this->db->query($sql);
 
